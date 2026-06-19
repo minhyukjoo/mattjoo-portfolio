@@ -18,11 +18,14 @@ const TABS: TabType[] = ["HOME", "FILMS", "PHOTOS", "STORY", "CONTACT"];
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>("HOME");
-  const [, setDirection] = useState<number>(0);
+  const [direction, setDirection] = useState<number>(0);
 
   const handleTabChange = (newTab: TabType) => {
     const currentIndex = TABS.indexOf(activeTab);
     const newIndex = TABS.indexOf(newTab);
+    if (newIndex === currentIndex) return;
+    
+    // Set explicit direction matrix: 1 for moving forward (right), -1 for moving backward (left)
     setDirection(newIndex > currentIndex ? 1 : -1);
     setActiveTab(newTab);
   };
@@ -32,17 +35,20 @@ export default function Home() {
     const currentIndex = TABS.indexOf(activeTab);
 
     if (info.offset.x < -swipeThreshold && currentIndex < TABS.length - 1) {
-      const nextTab = TABS[currentIndex + 1];
-      handleTabChange(nextTab);
+      // Swiped finger Left -> Next Tab (Content slides Left)
+      setDirection(1);
+      setActiveTab(TABS[currentIndex + 1]);
     } else if (info.offset.x > swipeThreshold && currentIndex > 0) {
-      const prevTab = TABS[currentIndex - 1];
-      handleTabChange(prevTab);
+      // Swiped finger Right -> Prev Tab (Content slides Right)
+      setDirection(-1);
+      setActiveTab(TABS[currentIndex - 1]);
     }
   };
 
+  // Fixed cinematic spatial vectors to align exit coordinates with entry coordinates
   const variants = {
     enter: (dir: number) => ({
-      x: dir > 0 ? "100%" : "-100%",
+      x: dir > 0 ? "100vw" : "-100vw",
       opacity: 0
     }),
     center: {
@@ -50,7 +56,7 @@ export default function Home() {
       opacity: 1
     },
     exit: (dir: number) => ({
-      x: dir < 0 ? "100%" : "-100%",
+      x: dir > 0 ? "-100vw" : "100vw",
       opacity: 0
     })
   };
@@ -67,22 +73,23 @@ export default function Home() {
 
       <Navbar activeTab={activeTab} setActiveTab={handleTabChange} />
 
-      {/* Swipe Viewport */}
+      {/* Hardware Swiping Viewport Frame */}
       <motion.div 
         className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 pt-44 pb-24 z-10 flex-grow flex items-center justify-center touch-none cursor-grab active:cursor-grabbing select-none"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
+        dragElastic={0.15}
         onDragEnd={handleDragEnd}
       >
-        <AnimatePresence initial={false} mode="wait">
+        <AnimatePresence initial={false} custom={direction} mode="wait">
           <motion.div
             key={activeTab}
+            custom={direction}
             variants={variants}
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+            transition={{ x: { type: "spring", stiffness: 260, damping: 28 }, opacity: { duration: 0.15 } }}
             className="w-full flex items-center justify-center pointer-events-auto"
           >
             {activeTab === "HOME" && (
