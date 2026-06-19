@@ -39,28 +39,34 @@ export const Navbar = ({ activeTab, setActiveTab }: NavbarProps) => {
           <button
             key={item}
             type="button"
+            // CRITICAL MOBILE FIX: onTouchStart fires instantly at the browser's hardware level, 
+            // bypassing Chrome's layout-target validation bugs entirely.
+            onTouchStart={(e) => {
+              e.stopPropagation();
+              setActiveTab(item);
+            }}
             onClick={() => setActiveTab(item)}
-            className={`relative h-full min-w-[56px] sm:min-w-[70px] md:min-w-[80px] px-2.5 sm:px-4 md:px-5 uppercase flex items-center justify-center rounded-full outline-none cursor-pointer transition-colors duration-300 max-md:pointer-events-none ${
-              activeTab === item ? "text-black font-black" : "text-gray-400"
+            className={`relative h-full min-w-[56px] sm:min-w-[70px] md:min-w-[80px] px-2.5 sm:px-4 md:px-5 uppercase flex items-center justify-center rounded-full outline-none cursor-pointer transition-colors duration-300 ${
+              activeTab === item ? "text-black font-black" : "text-gray-400 hover:text-white"
             }`}
           >
             {activeTab === item && (
               <div className="absolute inset-0 z-0 pointer-events-none">
-                {/* 1. Core Amber Pill */}
+                {/* 1. Core Amber Solid Pill */}
                 <motion.div
                   layoutId="slidingPill"
                   className="absolute inset-0 bg-[#f59e0b] rounded-full"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
                 
-                {/* 2. Pro-Mist Glow Bloom */}
+                {/* 2. Pro-Mist Glow Layer 1 */}
                 <motion.div
                   layoutId="slidingBloom1"
                   className="absolute inset-0 bg-[#d97706]/80 rounded-full blur-md"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
 
-                {/* 3. High-Intensity Core Halation */}
+                {/* 3. High-Intensity Core Halation Layer 2 */}
                 <motion.div
                   layoutId="slidingBloom2"
                   className="absolute inset-[-4px] bg-[#f59e0b]/50 rounded-full blur-xl"
@@ -68,7 +74,7 @@ export const Navbar = ({ activeTab, setActiveTab }: NavbarProps) => {
                 />
               </div>
             )}
-            <span className="relative z-10">{item}</span>
+            <span className="relative z-10 pointer-events-none">{item}</span>
           </button>
         ))}
       </div>
