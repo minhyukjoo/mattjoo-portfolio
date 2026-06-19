@@ -1,10 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  background-color: #000319;
-  color: #f3f4f6;
+  /* Cinematic Black, White, & 1/4 Pro-Mist Warm Amber-Yellow */
+  --bg-dark: #000000;         
+  --bg-card: #0a0a0a;         
+  --amber-accent: #f59e0b;    /* Warm tungsten amber-yellow */
+  --amber-bloom: #d97706;     /* Under-layer halation shadow depth */
+  --text-light: #f9fafb;      
+  --text-muted: #9ca3af;     
 }
 
 body {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
   overflow-x: hidden;
+}
+
+.will-change-transform {
+  will-change: transform, opacity;
 }
